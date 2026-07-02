@@ -32,7 +32,7 @@ const DEFAULT_CATEGORIES = {
 
 const SHELF_TYPES = ["Standard", "Cold Storage", "Hazmat", "Bulk", "High-Value"];
 
-const SHELF_COLOR_PRESETS = ["#f6431f", "#2563eb", "#16a34a", "#d97706", "#dc2626", "#0891b2", "#db2777", "#6b7094"];
+const SHELF_COLOR_PRESETS = ["#f04912", "#2563eb", "#16a34a", "#d97706", "#dc2626", "#0891b2", "#db2777", "#6b7094"];
 
 const SUPER_ADMIN_EMAIL = "hf@bighappysmiley.com";
 const ADMIN_DOMAIN = "@bighappysmiley.com";
@@ -182,13 +182,30 @@ function ThemeProvider({ children }) {
     const stored = localStorage.getItem("sy_dark");
     return stored === null ? true : stored === "true";
   });
+  // When true (set by the landing page while it's mounted), the applied
+  // theme follows the OS/browser preference instead of the stored choice.
+  const [useSystem, setUseSystem] = useState(false);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-    localStorage.setItem("sy_dark", String(dark));
-  }, [dark]);
+    if (!useSystem) {
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      localStorage.setItem("sy_dark", String(dark));
+      return;
+    }
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const applySystemTheme = () => {
+      document.documentElement.setAttribute("data-theme", mq.matches ? "dark" : "light");
+    };
+    applySystemTheme();
+    mq.addEventListener("change", applySystemTheme);
+    return () => mq.removeEventListener("change", applySystemTheme);
+  }, [dark, useSystem]);
 
-  return <ThemeCtx.Provider value={{ dark, toggle: () => setDark((d) => !d) }}>{children}</ThemeCtx.Provider>;
+  return (
+    <ThemeCtx.Provider value={{ dark, toggle: () => setDark((d) => !d), setUseSystem }}>
+      {children}
+    </ThemeCtx.Provider>
+  );
 }
 function useTheme() { return useContext(ThemeCtx); }
 
@@ -427,6 +444,16 @@ const LANDING_FEATURES = [
 ];
 
 function LandingPage({ onEnter }) {
+  const { setUseSystem } = useTheme();
+
+  // The landing page always follows the visitor's OS/browser preference,
+  // regardless of any dark/light choice made after signing in. Restore
+  // the user's stored preference the moment the landing page unmounts.
+  useEffect(() => {
+    setUseSystem(true);
+    return () => setUseSystem(false);
+  }, [setUseSystem]);
+
   return (
     <div className="landing">
       <header className="landing-header">
@@ -1515,7 +1542,7 @@ function WarehouseMap2D({ authUser, shelves, items, settings, setSettings, notif
               onMouseDown={(e) => onMouseDown(e, entry)}
               style={{
                 position: "absolute", left: entry.x, top: entry.y, width: entry.w, height: entry.h,
-                background: (shelf.color || "#f6431f") + "26", border: "2px solid " + (shelf.color || "#f6431f"),
+                background: (shelf.color || "#f04912") + "26", border: "2px solid " + (shelf.color || "#f04912"),
                 borderRadius: 8, cursor: "grab", padding: 8, userSelect: "none",
               }}
             >
@@ -1536,7 +1563,7 @@ function WarehouseMap2D({ authUser, shelves, items, settings, setSettings, notif
               const placed = placedIds.has(shelf.id);
               return (
                 <div key={shelf.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span className="dot" style={{ background: shelf.color || "#f6431f" }} />
+                  <span className="dot" style={{ background: shelf.color || "#f04912" }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{shelf.name}</div>
                     <div style={{ fontSize: "0.72rem", color: "var(--muted)" }}>{itemCountForShelf(shelf)} item(s)</div>
@@ -1629,7 +1656,7 @@ function buildShelfGroup(shelf, items) {
   const width = Math.max(2, cols * 0.9);
   const depth = 1.0;
   const height = Math.max(1.5, rows * 0.65 + 0.4);
-  const color = new THREE.Color(shelf.color || "#f6431f");
+  const color = new THREE.Color(shelf.color || "#f04912");
 
   const steelMat = new THREE.MeshStandardMaterial({ color: 0x8a8f9e, metalness: 0.6, roughness: 0.4 });
   const backMat = new THREE.MeshStandardMaterial({ color: 0xb6bac6, metalness: 0.3, roughness: 0.6 });
@@ -1689,7 +1716,7 @@ function buildShelfGroup(shelf, items) {
     itemMeshes.push({ mesh: box, item });
   });
 
-  const signTex = makeSignTexture(shelf.name, shelfItems.length + "/" + capacity + " slots filled", rows + " rows × " + cols + " cols", shelf.color || "#f6431f");
+  const signTex = makeSignTexture(shelf.name, shelfItems.length + "/" + capacity + " slots filled", rows + " rows × " + cols + " cols", shelf.color || "#f04912");
   const signMat = new THREE.MeshBasicMaterial({ map: signTex, transparent: true });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.72), signMat);
   sign.position.set(0, height + 0.5, 0);
@@ -2001,7 +2028,7 @@ function WarehouseMap3D({ shelves, items, settings, categories }) {
         <div style={{
           position: "absolute", top: 12, right: 12, width: 240, background: "rgba(15,17,25,0.85)",
           backdropFilter: "blur(6px)", borderRadius: 10, padding: 14, color: "#fff",
-          borderLeft: "4px solid " + (categories[selectedItem.category] || "#f6431f"),
+          borderLeft: "4px solid " + (categories[selectedItem.category] || "#f04912"),
         }}>
           <button className="icon-btn" style={{ float: "right", color: "#fff" }} onClick={() => setSelectedItem(null)}><Icon name="x" size={14} /></button>
           <h3 style={{ margin: "0 0 8px", fontSize: "1rem" }}>{selectedItem.name}</h3>
