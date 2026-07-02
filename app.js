@@ -130,11 +130,11 @@ function Icon({ name, size = 18, style }) {
 }
 
 // Wordmark used in the sidebar, auth screen, and landing page header —
-// an orange chip with the lowercase wordmark in a light tint, per brand.
+// the real Brandmark logo asset on an orange chip, per brand.
 function LogoMark({ size = 18 }) {
   return (
     <span className="logo-chip">
-      <span className="logo-chip-text" style={{ fontSize: size }}>Inventyzer</span>
+      <img src="./logo.svg" alt="Inventyzer" style={{ height: size, display: "block" }} />
     </span>
   );
 }
