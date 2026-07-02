@@ -129,11 +129,12 @@ function Icon({ name, size = 18, style }) {
   );
 }
 
-// Wordmark used in the sidebar, auth screen, and landing page header.
+// Wordmark used in the sidebar, auth screen, and landing page header —
+// an orange chip with the lowercase wordmark in a light tint, per brand.
 function LogoMark({ size = 18 }) {
   return (
-    <span className="wordmark" style={{ fontSize: size }}>
-      Invent<span className="wordmark-accent">yzer</span>
+    <span className="logo-chip">
+      <span className="logo-chip-text" style={{ fontSize: size }}>Inventyzer</span>
     </span>
   );
 }
@@ -332,8 +333,7 @@ function AuthScreen({ initialMode = "login", onBack }) {
           </button>
         )}
         <div className="auth-logo-row">
-          <div className="logo-box"><Icon name="building" size={26} style={{ color: "#fff" }} /></div>
-          <div className="name"><LogoMark size={22} /></div>
+          <LogoMark size={22} />
           <div className="sub">by BigHappySmiley</div>
         </div>
 
@@ -552,10 +552,11 @@ function Sidebar({ view, setView, collapsed, setCollapsed, isAdmin, authUser, us
   return (
     <div className={"sidebar" + (collapsed ? " collapsed" : "")}>
       <div className="sidebar-logo-row" onClick={() => setCollapsed((c) => !c)}>
-        <div className="logo-box"><Icon name="building" size={18} style={{ color: "#fff" }} /></div>
-        {!collapsed && (
+        {collapsed ? (
+          <div className="logo-box"><Icon name="building" size={18} style={{ color: "#fff" }} /></div>
+        ) : (
           <div className="sidebar-brand">
-            <div className="name"><LogoMark size={15} /></div>
+            <LogoMark size={15} />
             <div className="sub">by BigHappySmiley</div>
           </div>
         )}

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="Inventyzer — real-time inventory tracking, barcode scanning, and warehouse mapping for teams who need to know what's on the shelf." />
 <title>Inventyzer — Inventory Management, Simplified</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23f6431f'/%3E%3Ctext x='32' y='45' font-family='Arial, sans-serif' font-weight='800' font-size='38' fill='white' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23f6431f'/%3E%3Ctext x='32' y='44' font-family='Arial, sans-serif' font-weight='600' font-size='36' fill='%23ffd59e' text-anchor='middle'%3Ei%3C/text%3E%3C/svg%3E" />
 <script>
   // Defensive cleanup: if this origin ever had a service worker or cached
   // responses registered by an older/different deploy, they can keep
@@ -43,6 +43,7 @@
   --accent: #f6431f;
   --accent-2: #c22e13;
   --accent-rgb: 246, 67, 31;
+  --accent-tint: #ffd59e;
   --success: #16a34a;
   --danger: #dc2626;
   --info: #2563eb;
@@ -98,10 +99,15 @@ a { color: var(--accent); }
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   display: flex; align-items: center; justify-content: center;
 }
-.sidebar-brand { line-height: 1.2; white-space: nowrap; }
-.sidebar-brand .name { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.95rem; }
-.wordmark { font-family: 'Poppins', sans-serif; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
-.wordmark-accent { color: var(--accent); }
+.sidebar-brand { line-height: 1.2; white-space: nowrap; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.logo-chip {
+  display: inline-flex; align-items: center; background: var(--accent);
+  border-radius: 8px; padding: 4px 10px; line-height: 1;
+}
+.logo-chip-text {
+  font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--accent-tint);
+  letter-spacing: -0.01em; text-transform: lowercase;
+}
 .sidebar-brand .sub { font-size: 0.7rem; color: var(--muted); }
 .sidebar-nav { flex: 1; padding: 10px 8px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
 .nav-group { display: flex; flex-direction: column; gap: 2px; }
@@ -200,8 +206,6 @@ html[data-theme="light"] .field input, html[data-theme="light"] .field select, h
 .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 20px; }
 .auth-card { width: 100%; max-width: 380px; }
 .auth-logo-row { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 26px; }
-.auth-logo-row .logo-box { width: 52px; height: 52px; border-radius: 14px; }
-.auth-logo-row .name { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.3rem; }
 .auth-logo-row .sub { color: var(--muted); font-size: 0.8rem; }
 .auth-link { color: var(--accent); font-size: 0.8rem; background: none; border: none; padding: 0; text-decoration: none; }
 .auth-switch { text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--muted); }
