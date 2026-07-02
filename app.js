@@ -1,4 +1,4 @@
-// Inventory Manager — by BigHappySmiley
+// Inventyzer — by BigHappySmiley
 // Single-file React app (in-browser Babel transform, no bundler).
 const { useState, useEffect, useRef, useContext, createContext, useMemo, useCallback } = React;
 
@@ -32,7 +32,7 @@ const DEFAULT_CATEGORIES = {
 
 const SHELF_TYPES = ["Standard", "Cold Storage", "Hazmat", "Bulk", "High-Value"];
 
-const SHELF_COLOR_PRESETS = ["#7c3aed", "#2563eb", "#16a34a", "#d97706", "#dc2626", "#0891b2", "#db2777", "#6b7094"];
+const SHELF_COLOR_PRESETS = ["#f6431f", "#2563eb", "#16a34a", "#d97706", "#dc2626", "#0891b2", "#db2777", "#6b7094"];
 
 const SUPER_ADMIN_EMAIL = "hf@bighappysmiley.com";
 const ADMIN_DOMAIN = "@bighappysmiley.com";
@@ -126,6 +126,15 @@ function Icon({ name, size = 18, style }) {
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
       <path d={d} />
     </svg>
+  );
+}
+
+// Wordmark used in the sidebar, auth screen, and landing page header.
+function LogoMark({ size = 18 }) {
+  return (
+    <span className="wordmark" style={{ fontSize: size }}>
+      Invent<span className="wordmark-accent">yzer</span>
+    </span>
   );
 }
 
@@ -225,8 +234,8 @@ async function isUsernameTaken(username, excludeUid) {
 // ============================================================
 // AUTH SCREEN
 // ============================================================
-function AuthScreen() {
-  const [mode, setMode] = useState("login"); // login | register | forgot
+function AuthScreen({ initialMode = "login", onBack }) {
+  const [mode, setMode] = useState(initialMode); // login | register | forgot
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -317,9 +326,14 @@ function AuthScreen() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
+        {onBack && (
+          <button type="button" className="auth-link" onClick={onBack} style={{ marginBottom: 14 }}>
+            ← Back to home
+          </button>
+        )}
         <div className="auth-logo-row">
           <div className="logo-box"><Icon name="building" size={26} style={{ color: "#fff" }} /></div>
-          <div className="name">Inventory Manager</div>
+          <div className="name"><LogoMark size={22} /></div>
           <div className="sub">by BigHappySmiley</div>
         </div>
 
@@ -401,17 +415,111 @@ function AuthScreen() {
 }
 
 // ============================================================
+// LANDING PAGE
+// ============================================================
+const LANDING_FEATURES = [
+  { icon: "scan", title: "Barcode Scanning", desc: "Scan items in with a USB or camera scanner — no manual data entry, no typos." },
+  { icon: "dashboard", title: "Real-Time Sync", desc: "Every change syncs instantly across your whole team, from any device." },
+  { icon: "map", title: "3D Warehouse Map", desc: "Walk through a live 3D model of your warehouse to see exactly where things live." },
+  { icon: "shelf", title: "Storage Setup", desc: "Model your real shelves — rows, columns, and capacity — and track fill levels at a glance." },
+  { icon: "support", title: "Support Tickets", desc: "Users can open tickets right from the app; admins respond without leaving the dashboard." },
+  { icon: "shield", title: "Role-Based Access", desc: "Give teammates the right level of access, from everyday users to full admins." },
+];
+
+function LandingPage({ onEnter }) {
+  return (
+    <div className="landing">
+      <header className="landing-header">
+        <div className="landing-header-inner">
+          <LogoMark size={19} />
+          <nav className="landing-nav">
+            <a href="#features">Features</a>
+            <button type="button" className="auth-link" onClick={() => onEnter("login")}>Sign In</button>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => onEnter("register")}>Get Started</button>
+          </nav>
+        </div>
+      </header>
+
+      <section className="landing-hero">
+        <div className="landing-hero-text">
+          <h1>Know what's on every shelf.</h1>
+          <p className="landing-hero-sub">
+            Inventyzer is real-time inventory tracking, barcode scanning, and warehouse mapping —
+            built for teams who are done guessing what's in stock.
+          </p>
+          <div className="landing-hero-cta">
+            <button type="button" className="btn btn-primary" onClick={() => onEnter("register")}>
+              Get Started Free
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={() => onEnter("login")}>
+              Sign In
+            </button>
+          </div>
+        </div>
+        <div className="landing-hero-visual" aria-hidden="true">
+          <div className="landing-mock-card">
+            <div className="stat-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)", marginBottom: 14 }}>
+              <div className="card stat-card">
+                <div className="stat-label">Total Items</div>
+                <div className="stat-value">1,284</div>
+              </div>
+              <div className="card stat-card danger">
+                <div className="stat-label">Low Stock</div>
+                <div className="stat-value">12</div>
+              </div>
+            </div>
+            <div className="card" style={{ padding: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span className="dot" style={{ background: "var(--accent)" }} />
+                <span style={{ fontSize: "0.82rem", fontWeight: 600 }}>Cold Storage — Aisle 3</span>
+              </div>
+              <div className="progress-track"><div className="progress-fill" style={{ width: "72%" }} /></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="landing-features" id="features">
+        <h2 className="landing-section-title">Everything your warehouse needs</h2>
+        <div className="landing-features-grid">
+          {LANDING_FEATURES.map((f) => (
+            <div key={f.title} className="card landing-feature-card">
+              <div className="landing-feature-icon"><Icon name={f.icon} size={20} /></div>
+              <h3>{f.title}</h3>
+              <p>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-cta">
+        <h2>Ready to get organized?</h2>
+        <p>Create a free account and set up your first shelf in minutes.</p>
+        <button type="button" className="btn btn-primary" onClick={() => onEnter("register")}>
+          Get Started Free
+        </button>
+      </section>
+
+      <footer className="landing-footer">
+        <LogoMark size={15} />
+        <span>© {new Date().getFullYear()} BigHappySmiley</span>
+      </footer>
+    </div>
+  );
+}
+
+// ============================================================
 // SIDEBAR
 // ============================================================
 const NAV_ITEMS = [
-  { key: "dashboard", label: "Dashboard", icon: "dashboard" },
-  { key: "add", label: "Add Item", icon: "add" },
-  { key: "all", label: "View All", icon: "list" },
-  { key: "map", label: "Warehouse Map", icon: "map" },
-  { key: "storage", label: "Storage Setup", icon: "shelf" },
-  { key: "support", label: "Support", icon: "support" },
-  { key: "admin", label: "Admin Panel", icon: "shield", adminOnly: true },
-  { key: "settings", label: "Settings", icon: "settings" },
+  { key: "dashboard", label: "Dashboard", icon: "dashboard", group: null },
+  { key: "add", label: "Add Item", icon: "add", group: "Inventory" },
+  { key: "all", label: "View All", icon: "list", group: "Inventory" },
+  { key: "map", label: "Warehouse Map", icon: "map", group: "Warehouse" },
+  { key: "storage", label: "Storage Setup", icon: "shelf", group: "Warehouse" },
+  { key: "support", label: "Support", icon: "support", group: "Account" },
+  { key: "settings", label: "Settings", icon: "settings", group: "Account" },
+  { key: "admin", label: "Admin Panel", icon: "shield", group: "Admin", adminOnly: true },
 ];
 
 function Sidebar({ view, setView, collapsed, setCollapsed, isAdmin, authUser, username, openTicketCount, onSignOut }) {
@@ -419,32 +527,46 @@ function Sidebar({ view, setView, collapsed, setCollapsed, isAdmin, authUser, us
   const displayName = username || authUser.email;
   const initial = (authUser.email || "?").charAt(0).toUpperCase();
 
+  const groups = [];
+  items.forEach((n) => {
+    let g = groups.find((x) => x.name === n.group);
+    if (!g) { g = { name: n.group, items: [] }; groups.push(g); }
+    g.items.push(n);
+  });
+
+  const renderItem = (n) => (
+    <button
+      key={n.key}
+      className={"nav-item" + (view === n.key ? " active" : "")}
+      onClick={() => setView(n.key)}
+      title={collapsed ? (n.key === "support" && isAdmin ? "Tickets" : n.label) : undefined}
+    >
+      <span className="nav-icon"><Icon name={n.icon} size={17} /></span>
+      {!collapsed && <span>{n.key === "support" && isAdmin ? "Tickets" : n.label}</span>}
+      {n.key === "support" && openTicketCount > 0 && !collapsed && (
+        <span className="nav-badge">{openTicketCount}</span>
+      )}
+    </button>
+  );
+
   return (
     <div className={"sidebar" + (collapsed ? " collapsed" : "")}>
       <div className="sidebar-logo-row" onClick={() => setCollapsed((c) => !c)}>
         <div className="logo-box"><Icon name="building" size={18} style={{ color: "#fff" }} /></div>
         {!collapsed && (
           <div className="sidebar-brand">
-            <div className="name">Inventory Manager</div>
+            <div className="name"><LogoMark size={15} /></div>
             <div className="sub">by BigHappySmiley</div>
           </div>
         )}
       </div>
 
       <div className="sidebar-nav">
-        {items.map((n) => (
-          <button
-            key={n.key}
-            className={"nav-item" + (view === n.key ? " active" : "")}
-            onClick={() => setView(n.key)}
-            title={collapsed ? (n.key === "support" && isAdmin ? "Tickets" : n.label) : undefined}
-          >
-            <span className="nav-icon"><Icon name={n.icon} size={17} /></span>
-            {!collapsed && <span>{n.key === "support" && isAdmin ? "Tickets" : n.label}</span>}
-            {n.key === "support" && openTicketCount > 0 && !collapsed && (
-              <span className="nav-badge">{openTicketCount}</span>
-            )}
-          </button>
+        {groups.map((g) => (
+          <div key={g.name || "top"} className="nav-group">
+            {g.name && !collapsed && <div className="nav-group-label">{g.name}</div>}
+            {g.items.map(renderItem)}
+          </div>
         ))}
       </div>
 
@@ -492,6 +614,7 @@ function App() {
 
   const [view, setView] = useState("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [preAuthScreen, setPreAuthScreen] = useState("landing"); // landing | auth
 
   // Auth state + admin bootstrap
   useEffect(() => {
@@ -507,6 +630,7 @@ function App() {
         setUsersMeta(null);
         setSupportTickets([]);
         setView("dashboard");
+        setPreAuthScreen("landing");
         return;
       }
       try {
@@ -588,7 +712,15 @@ function App() {
   }
 
   if (authUser === null) {
-    return <AuthScreen />;
+    if (preAuthScreen === "landing") {
+      return <LandingPage onEnter={(mode) => setPreAuthScreen(mode)} />;
+    }
+    return (
+      <AuthScreen
+        initialMode={preAuthScreen === "register" ? "register" : "login"}
+        onBack={() => setPreAuthScreen("landing")}
+      />
+    );
   }
 
   if (!itemsLoaded || !shelvesLoaded) {
@@ -654,6 +786,41 @@ function Dashboard({ authUser, items, shelves, categories, setView }) {
     <div>
       <h1 className="page-title">Dashboard</h1>
       <p className="page-sub">{authUser.email} · {fmtDateLong(Date.now())}</p>
+
+      {shelfCount === 0 && uniqueSkus === 0 && (
+        <div className="card onboarding-card">
+          <h3 className="panel-title">Welcome to Inventyzer 👋</h3>
+          <p style={{ color: "var(--muted)", fontSize: "0.88rem", margin: "0 0 16px" }}>
+            Let's get your warehouse set up. It only takes a few minutes.
+          </p>
+          <div className="onboarding-steps">
+            <button type="button" className="onboarding-step" onClick={() => setView("storage")}>
+              <span className="onboarding-step-num">1</span>
+              <span className="onboarding-step-icon"><Icon name="shelf" size={18} /></span>
+              <div>
+                <div className="onboarding-step-title">Set up storage</div>
+                <div className="onboarding-step-desc">Create your first shelf</div>
+              </div>
+            </button>
+            <button type="button" className="onboarding-step" onClick={() => setView("add")}>
+              <span className="onboarding-step-num">2</span>
+              <span className="onboarding-step-icon"><Icon name="add" size={18} /></span>
+              <div>
+                <div className="onboarding-step-title">Add your first item</div>
+                <div className="onboarding-step-desc">Scan or type it in</div>
+              </div>
+            </button>
+            <button type="button" className="onboarding-step" onClick={() => setView("map")}>
+              <span className="onboarding-step-num">3</span>
+              <span className="onboarding-step-icon"><Icon name="map" size={18} /></span>
+              <div>
+                <div className="onboarding-step-title">Explore the map</div>
+                <div className="onboarding-step-desc">Walk through it in 3D</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="stat-grid">
         <div className="card stat-card">
@@ -1347,7 +1514,7 @@ function WarehouseMap2D({ authUser, shelves, items, settings, setSettings, notif
               onMouseDown={(e) => onMouseDown(e, entry)}
               style={{
                 position: "absolute", left: entry.x, top: entry.y, width: entry.w, height: entry.h,
-                background: (shelf.color || "#7c3aed") + "26", border: "2px solid " + (shelf.color || "#7c3aed"),
+                background: (shelf.color || "#f6431f") + "26", border: "2px solid " + (shelf.color || "#f6431f"),
                 borderRadius: 8, cursor: "grab", padding: 8, userSelect: "none",
               }}
             >
@@ -1368,7 +1535,7 @@ function WarehouseMap2D({ authUser, shelves, items, settings, setSettings, notif
               const placed = placedIds.has(shelf.id);
               return (
                 <div key={shelf.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span className="dot" style={{ background: shelf.color || "#7c3aed" }} />
+                  <span className="dot" style={{ background: shelf.color || "#f6431f" }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{shelf.name}</div>
                     <div style={{ fontSize: "0.72rem", color: "var(--muted)" }}>{itemCountForShelf(shelf)} item(s)</div>
@@ -1461,7 +1628,7 @@ function buildShelfGroup(shelf, items) {
   const width = Math.max(2, cols * 0.9);
   const depth = 1.0;
   const height = Math.max(1.5, rows * 0.65 + 0.4);
-  const color = new THREE.Color(shelf.color || "#7c3aed");
+  const color = new THREE.Color(shelf.color || "#f6431f");
 
   const steelMat = new THREE.MeshStandardMaterial({ color: 0x8a8f9e, metalness: 0.6, roughness: 0.4 });
   const backMat = new THREE.MeshStandardMaterial({ color: 0xb6bac6, metalness: 0.3, roughness: 0.6 });
@@ -1521,7 +1688,7 @@ function buildShelfGroup(shelf, items) {
     itemMeshes.push({ mesh: box, item });
   });
 
-  const signTex = makeSignTexture(shelf.name, shelfItems.length + "/" + capacity + " slots filled", rows + " rows × " + cols + " cols", shelf.color || "#7c3aed");
+  const signTex = makeSignTexture(shelf.name, shelfItems.length + "/" + capacity + " slots filled", rows + " rows × " + cols + " cols", shelf.color || "#f6431f");
   const signMat = new THREE.MeshBasicMaterial({ map: signTex, transparent: true });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.72), signMat);
   sign.position.set(0, height + 0.5, 0);
@@ -1833,7 +2000,7 @@ function WarehouseMap3D({ shelves, items, settings, categories }) {
         <div style={{
           position: "absolute", top: 12, right: 12, width: 240, background: "rgba(15,17,25,0.85)",
           backdropFilter: "blur(6px)", borderRadius: 10, padding: 14, color: "#fff",
-          borderLeft: "4px solid " + (categories[selectedItem.category] || "#7c3aed"),
+          borderLeft: "4px solid " + (categories[selectedItem.category] || "#f6431f"),
         }}>
           <button className="icon-btn" style={{ float: "right", color: "#fff" }} onClick={() => setSelectedItem(null)}><Icon name="x" size={14} /></button>
           <h3 style={{ margin: "0 0 8px", fontSize: "1rem" }}>{selectedItem.name}</h3>

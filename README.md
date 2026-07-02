@@ -1,11 +1,12 @@
-# Inventory Manager
+# Inventyzer
 
-A full-stack, multi-user inventory management web app — barcode scanning, a
-searchable/bulk-editable item table, 2D and first-person-3D warehouse maps,
-shelf/storage setup, per-user settings, and an admin-only support/role
-panel. Built as a single-file static site (`index.html` + `app.js`) using
-React 18 (UMD), Babel Standalone (in-browser JSX), and the Firebase compat
-SDK — no build step, no bundler.
+A full-stack, multi-user inventory management web app — a public marketing
+landing page, barcode scanning, a searchable/bulk-editable item table, 2D
+and first-person-3D warehouse maps, shelf/storage setup, per-user settings,
+user-facing support tickets with an admin response view, and a role
+management panel. Built as a single-file static site (`index.html` +
+`app.js`) using React 18 (UMD), Babel Standalone (in-browser JSX), and the
+Firebase compat SDK — no build step, no bundler.
 
 ## 1. Create / connect a Firebase project
 
