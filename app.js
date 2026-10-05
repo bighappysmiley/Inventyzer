@@ -1003,20 +1003,16 @@ function BarcodeScannerPanel({ setField }) {
 // ============================================================
 const EMPTY_ITEM_FORM = {
   name: "", sku: "", category: "Other", quantity: 1, minStock: 0, price: 0,
-  company: "", unit: 1, shelf: 1, row: 1, notes: "",
+  company: "", location: "", notes: "",
 };
 
-function AddItem({ authUser, categories, customFields, warehouseConfig, notify }) {
+function AddItem({ authUser, categories, customFields, shelves, notify, setView }) {
   const [form, setForm] = useState(EMPTY_ITEM_FORM);
   const [customValues, setCustomValues] = useState({});
   const [busy, setBusy] = useState(false);
 
   const setField = (key, value) => setForm((f) => ({ ...f, [key]: value }));
   const setCustomValue = (id, value) => setCustomValues((c) => ({ ...c, [id]: value }));
-
-  const units = Array.from({ length: warehouseConfig.units || 1 }, (_, i) => i + 1);
-  const shelfNums = Array.from({ length: warehouseConfig.shelves || 1 }, (_, i) => i + 1);
-  const rows = Array.from({ length: warehouseConfig.rows || 1 }, (_, i) => i + 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1026,9 +1022,6 @@ function AddItem({ authUser, categories, customFields, warehouseConfig, notify }
     }
     setBusy(true);
     try {
-      const unit = Number(form.unit) || 1;
-      const shelf = Number(form.shelf) || 1;
-      const row = Number(form.row) || 1;
       await db.collection("users").doc(authUser.uid).collection("items").add({
         name: form.name.trim(),
         sku: form.sku.trim(),
@@ -1037,8 +1030,7 @@ function AddItem({ authUser, categories, customFields, warehouseConfig, notify }
         minStock: Number(form.minStock) || 0,
         price: Number(form.price) || 0,
         company: form.company.trim(),
-        unit, shelf, row,
-        location: composeLocation(unit, shelf, row),
+        location: form.location,
         notes: form.notes,
         customFields: customValues,
         addedAt: Date.now(),
@@ -1100,29 +1092,22 @@ function AddItem({ authUser, categories, customFields, warehouseConfig, notify }
             <input type="text" value={form.company} onChange={(e) => setField("company", e.target.value)} />
           </div>
 
-          <div className="field-row">
-            <div className="field">
-              <label>Unit</label>
-              <select value={form.unit} onChange={(e) => setField("unit", e.target.value)}>
-                {units.map((n) => <option key={n} value={n}>{n}</option>)}
+          <div className="field">
+            <label>Shelf</label>
+            {shelves.length > 0 ? (
+              <select value={form.location} onChange={(e) => setField("location", e.target.value)}>
+                <option value="">Unassigned</option>
+                {shelves.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
               </select>
-            </div>
-            <div className="field">
-              <label>Shelf</label>
-              <select value={form.shelf} onChange={(e) => setField("shelf", e.target.value)}>
-                {shelfNums.map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
-            <div className="field">
-              <label>Row</label>
-              <select value={form.row} onChange={(e) => setField("row", e.target.value)}>
-                {rows.map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
+            ) : (
+              <p className="field-hint">
+                No shelves yet —{" "}
+                <button type="button" className="auth-link" onClick={() => setView && setView("storage")}>
+                  create one in Storage Setup
+                </button>
+              </p>
+            )}
           </div>
-          <p className="field-hint" style={{ marginTop: -8, marginBottom: 14 }}>
-            📍 Unit {form.unit} · Shelf {form.shelf} · Row {form.row}
-          </p>
 
           {customFields.length > 0 && (
             <>
