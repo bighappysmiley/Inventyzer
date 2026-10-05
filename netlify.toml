@@ -8,16 +8,37 @@
 [build.processing]
   skip_processing = true
 
+# inventyzer.com is being retired in favor of im.bhswebsite.org — anyone
+# still landing on the old domain gets a "we've moved" notice instead of
+# the app. Host-scoped rules must come before the catch-all SPA rule below,
+# since Netlify uses the first matching redirect.
+[[redirects]]
+  from = "https://inventyzer.com/*"
+  to = "/moving.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://www.inventyzer.com/*"
+  to = "/moving.html"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Never let the browser/CDN cache a stale index.html across deploys —
-# this is a single-page app and the HTML is the entry point that must
-# always reflect the latest deploy.
+# Never let the browser/CDN cache a stale index.html (or the moving notice)
+# across deploys — this is a single-page app and the HTML is the entry
+# point that must always reflect the latest deploy.
 [[headers]]
   for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/moving.html"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
